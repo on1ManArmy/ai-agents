@@ -10,6 +10,7 @@ load_dotenv()
 def main():
     print("Hello from langchain-course!")
     API_KEY = os.getenv("OPENAI_API_KEY")
+    print("Loaded environment variables.")
     print("Api Key is: ", API_KEY)
 
 if __name__ == "__main__":
