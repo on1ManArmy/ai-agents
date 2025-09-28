@@ -5,6 +5,8 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
+
+
 def main():
     print("Hello from langchain-course!")
     API_KEY = os.getenv("OPENAI_API_KEY")
