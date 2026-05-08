@@ -1,30 +1,35 @@
 from dotenv import load_dotenv
 load_dotenv()
-from typing import List
-from pydantic import BaseModel, Field
-from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
-from langchain_groq import ChatGroq
-from langchain_tavily import TavilySearch
+from langchain.chat_models import init_chat_model
+from langchain.tools import tool
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
-class Source(BaseModel):
-    """Scheme for source used by agent"""
-    url: str = Field(description="Source URL")
+MAX_ITERATIONS = 10
+MODEL = "quen3:1.7b"
 
-class AgentResponse(BaseModel):
-    """Scheme for response to agent"""
-    answer: str = Field(description="Response to agent")
-    sources: List = Field(default_factory=list, description="List of sources used by agent")
+# tools
+@tool
+def get_product_price(product: str) -> float:
+    """Lookup the price of a product by its name in catalog"""
+    prices = {"laptop": 1299.99, "headphones": 149.5, "keyword": 89.50}
+    return prices[product]
 
-llm = ChatGroq(model="llama-3.3-70b-versatile")
-tools = [TavilySearch()]
-agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
+@tool
+def apply_discount(price: float, discount_tier: str) -> float:
+    """Apply discount to price
+    Available tiers are: bronze, silver, gold"""
+    discount_percentages = {"bronze": 5, "silver": 10, "gold": 20}
+    discount = discount_percentages[discount_tier]
+    return round(price * (1 - discount/100), 2)
+
+# agents loop
+def run_agent(question: str):
+    pass
 
 def main():
-    result = agent.invoke({"messages": HumanMessage(
-        content="Give me 3 Job search options from linkedin regarding AWS, Nodejs, and AI agets"
-    )})
-    print(result["messages"][-1].content)
+    print("Welcome to LangChain! (.bind_tools)")
+    result = run_agent("What is the price of laptop after applying gold discount?")
+    print(result)
 
 if __name__ == "__main__":
     main()
